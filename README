@@ -8,24 +8,29 @@ Frontend: A simple React.js app for displaying the stock data to users.
 Authentication: Basic authentication is used to secure the backend API using Spring Security.
 Scalability: Deployed using AWS services (EC2, API Gateway, DynamoDB) for scalability and high availability.
 Microservices: Utilizes Spring Cloud for service discovery and configuration management in a distributed setup.
+
 Architecture
 1. Frontend (React.js)
 Built using React.js to create an interactive user interface.
 Uses Axios to send GET requests to the backend API (via AWS API Gateway).
 Allows users to input a stock symbol (e.g., AAPL) and displays the real-time stock data.
+
 2. Backend (Spring Boot)
 Exposes a REST API to provide stock data.
 Fetches real-time stock data from an external API (Alpha Vantage).
 Persists stock data in AWS DynamoDB for future queries.
 Secured using Spring Security with Basic Authentication to ensure only authenticated users can access the stock data.
+
 3. Security (Spring Security)
 Basic Authentication is configured for all API endpoints that require stock data access.
 A default user (user) and password (password) are used for authentication.
+
 4. Cloud & Deployment
 AWS API Gateway is used to expose the Spring Boot REST API to the internet.
 AWS DynamoDB stores the stock data.
 AWS EC2 hosts the Spring Boot application. Alternatively, the application can be hosted on AWS Lambda using a serverless setup.
 Spring Cloud is optionally used for centralized configuration and service discovery, making it easier to manage multiple microservices in production.
+
 Prerequisites
 Before running the app, make sure you have the following:
 
@@ -33,6 +38,7 @@ Java 11+ for the Spring Boot application.
 Node.js and npm for the React.js frontend.
 AWS account for deploying the application to EC2, API Gateway, and DynamoDB.
 Maven for building the Spring Boot application.
+
 Setup
 1. Frontend (React.js)
 The React frontend allows users to interact with the backend API to retrieve and display stock data.
@@ -122,6 +128,7 @@ Run the React app:
 bash
 Copy code
 npm start
+
 2. Backend (Spring Boot)
 The Spring Boot backend handles stock data fetching, storage in DynamoDB, and exposure of REST APIs.
 
