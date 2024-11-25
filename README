@@ -1,1 +1,192 @@
+Stock Ticker Application
+Overview
+The Stock Ticker app is a real-time stock tracking application that allows users to retrieve and monitor stock prices for various symbols. It is designed with a React.js frontend, a Spring Boot backend with Spring Security for authentication, and integrates with AWS services for deployment and scalability. The stock data is fetched from the Alpha Vantage API and persisted in AWS DynamoDB. The backend exposes a REST API secured with Spring Security, which is accessible via AWS API Gateway.
 
+Key Features
+Real-time Stock Data: Fetches stock data (price, change, volume) from an external API (Alpha Vantage) and stores it in AWS DynamoDB.
+Frontend: A simple React.js app for displaying the stock data to users.
+Authentication: Basic authentication is used to secure the backend API using Spring Security.
+Scalability: Deployed using AWS services (EC2, API Gateway, DynamoDB) for scalability and high availability.
+Microservices: Utilizes Spring Cloud for service discovery and configuration management in a distributed setup.
+Architecture
+1. Frontend (React.js)
+Built using React.js to create an interactive user interface.
+Uses Axios to send GET requests to the backend API (via AWS API Gateway).
+Allows users to input a stock symbol (e.g., AAPL) and displays the real-time stock data.
+2. Backend (Spring Boot)
+Exposes a REST API to provide stock data.
+Fetches real-time stock data from an external API (Alpha Vantage).
+Persists stock data in AWS DynamoDB for future queries.
+Secured using Spring Security with Basic Authentication to ensure only authenticated users can access the stock data.
+3. Security (Spring Security)
+Basic Authentication is configured for all API endpoints that require stock data access.
+A default user (user) and password (password) are used for authentication.
+4. Cloud & Deployment
+AWS API Gateway is used to expose the Spring Boot REST API to the internet.
+AWS DynamoDB stores the stock data.
+AWS EC2 hosts the Spring Boot application. Alternatively, the application can be hosted on AWS Lambda using a serverless setup.
+Spring Cloud is optionally used for centralized configuration and service discovery, making it easier to manage multiple microservices in production.
+Prerequisites
+Before running the app, make sure you have the following:
+
+Java 11+ for the Spring Boot application.
+Node.js and npm for the React.js frontend.
+AWS account for deploying the application to EC2, API Gateway, and DynamoDB.
+Maven for building the Spring Boot application.
+Setup
+1. Frontend (React.js)
+The React frontend allows users to interact with the backend API to retrieve and display stock data.
+
+Steps to set up the React app:
+Clone the repository or create a new React app:
+
+bash
+Copy code
+npx create-react-app stock-dashboard
+cd stock-dashboard
+Install Axios for making API requests:
+
+bash
+Copy code
+npm install axios
+Create a React component (StockComponent.js) to fetch and display stock data:
+
+jsx
+Copy code
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+const StockComponent = () => {
+  const [stockData, setStockData] = useState(null);
+  const [symbol, setSymbol] = useState("AAPL"); // Default stock symbol
+
+  useEffect(() => {
+    fetchStockData(symbol);
+  }, [symbol]);
+
+  const fetchStockData = async (symbol) => {
+    try {
+      const response = await axios.get(
+        `https://<api-id>.execute-api.<region>.amazonaws.com/prod/api/stock/${symbol}`
+      );
+      setStockData(response.data);
+    } catch (error) {
+      console.error("Error fetching stock data", error);
+    }
+  };
+
+  return (
+    <div>
+      <h1>Stock Data for {symbol}</h1>
+      <div>
+        <label>Stock Symbol:</label>
+        <input
+          type="text"
+          value={symbol}
+          onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+        />
+      </div>
+
+      {stockData ? (
+        <div>
+          <p>Price: ${stockData.price}</p>
+          <p>Change: ${stockData.change}</p>
+          <p>Volume: {stockData.volume}</p>
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
+  );
+};
+
+export default StockComponent;
+Add the component to the main App.js file:
+
+jsx
+Copy code
+import React from "react";
+import StockComponent from "./StockComponent";
+
+function App() {
+  return (
+    <div className="App">
+      <StockComponent />
+    </div>
+  );
+}
+
+export default App;
+Run the React app:
+
+bash
+Copy code
+npm start
+2. Backend (Spring Boot)
+The Spring Boot backend handles stock data fetching, storage in DynamoDB, and exposure of REST APIs.
+
+Steps to set up the Spring Boot application:
+Clone the repository or create a Spring Boot project.
+
+Add the necessary dependencies in the pom.xml:
+
+xml
+Copy code
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+<dependency>
+    <groupId>com.amazonaws</groupId>
+    <artifactId>aws-java-sdk-dynamodb</artifactId>
+</dependency>
+Create a service (StockService.java) to fetch and persist stock data in DynamoDB.
+
+Set up Spring Security for Basic Authentication (as shown previously).
+
+Set up a scheduled task (StockDataFetcher.java) to fetch stock data every 5 minutes from Alpha Vantage.
+
+Expose a REST API endpoint (StockController.java) to allow the React frontend to fetch stock data.
+
+Configure the Spring Boot app to connect to AWS DynamoDB for storage.
+
+3. AWS Integration
+DynamoDB: Create a DynamoDB table to store stock data.
+API Gateway: Set up AWS API Gateway to forward requests to the Spring Boot backend running on EC2 (or Lambda).
+EC2 Deployment: Deploy the Spring Boot application on AWS EC2.
+Lambda (optional): If you prefer a serverless solution, package your Spring Boot application using AWS Lambda and API Gateway.
+Security
+Basic Authentication
+The backend API is secured using Spring Security with Basic Authentication. Only authenticated users can access the stock data endpoints.
+
+To authenticate, use the following credentials:
+
+Username: user
+Password: password
+Configuration
+AWS Credentials: Set up your AWS SDK with proper credentials (aws.accessKeyId and aws.secretAccessKey) for interacting with DynamoDB and other AWS services.
+Spring Cloud Config (optional): If you’re using Spring Cloud Config, ensure your bootstrap.yml is configured to point to your configuration server.
+Running the Application
+1. Frontend
+To run the React app locally:
+
+bash
+Copy code
+npm start
+Visit http://localhost:3000 to see the stock ticker dashboard.
+
+2. Backend
+To run the Spring Boot backend locally:
+
+bash
+Copy code
+mvn spring-boot:run
+Ensure that your Spring Boot app is configured to run on port 8080 (or change it in application.properties).
