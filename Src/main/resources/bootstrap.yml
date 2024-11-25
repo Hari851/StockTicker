@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: stockticker
+  cloud:
+    config:
+      uri: http://stockticker:8888  # URL to your Spring Cloud Config server
